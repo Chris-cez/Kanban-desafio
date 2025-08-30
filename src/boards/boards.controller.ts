@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
-import { BoardsService } from './boards.service';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport/dist';
 import { CreateBoardDto } from '../dto/create-board.dto';
 import { UpdateBoardDto } from '../dto/update-board.dto';
-import { AuthGuard } from '@nestjs/passport/dist';
+import { BoardsService } from './boards.service';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('boards')

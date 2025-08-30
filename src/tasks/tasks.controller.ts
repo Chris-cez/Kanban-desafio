@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Get, Query, Param, Patch, Delete, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
-import { TasksService } from './tasks.service';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport/dist';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { UpdateTaskDto } from '../dto/update-task.dto';
-import { AuthGuard } from '@nestjs/passport/dist';
+import { TasksService } from './tasks.service';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('tasks')

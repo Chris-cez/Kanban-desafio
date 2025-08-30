@@ -8,9 +8,9 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @UseGuards(AuthGuard('local'))
-@Post('login')
-@HttpCode(HttpStatus.OK)
-async login(@Body() loginDto: LoginDto) {
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() loginDto: LoginDto) {
   const user = await this.authService.validateUser(loginDto.login, loginDto.password);
   if (!user) {
     throw new UnauthorizedException('Credenciais inválidas');

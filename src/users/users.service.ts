@@ -1,8 +1,8 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from 'src/entities/users.entity';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/entities/users.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {

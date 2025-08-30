@@ -1,7 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { User } from './users.entity';
-import { Board } from './boards.entity';
 import { BoardMemberPermission } from 'src/dto/create-board-member.dto';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import { Board } from './boards.entity';
+import { User } from './users.entity';
 
 @Unique(['user', 'board'])
 @Entity()

@@ -20,7 +20,7 @@ import { AuthModule } from 'src/auth/auth.module';
       username: process.env.DATABASE_USER ?? 'root',
       password: process.env.DATABASE_PASSWORD ?? 'root',
       database: process.env.DATABASE_NAME ?? 'kanban',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      entities: [__dirname + '/../entities/*.entity.{ts,js}'],
       synchronize: true,
     }),
     UsersModule,

@@ -1,7 +1,7 @@
-import { Controller, Post, Body, Get, Query, Patch, Param, Delete } from '@nestjs/common';
-import { BoardMembersService } from './board-members.service';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { CreateBoardMemberDto } from '../dto/create-board-member.dto';
 import { UpdateBoardMemberDto } from '../dto/update-board-member.dto';
+import { BoardMembersService } from './board-members.service';
 
 @Controller('board-members')
 export class BoardMembersController {

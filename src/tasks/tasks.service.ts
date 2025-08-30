@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Board } from 'src/entities/boards.entity';
+import { Task } from 'src/entities/tasks.entity';
+import { User } from 'src/entities/users.entity';
+import { Repository } from 'typeorm';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { UpdateTaskDto } from '../dto/update-task.dto';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Task } from 'src/entities/tasks.entity';
-import { Board } from 'src/entities/boards.entity';
-import { User } from 'src/entities/users.entity';
 
 @Injectable()
 export class TasksService {

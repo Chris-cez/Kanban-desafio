@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { BoardMember } from 'src/entities/board-members.entity';
-import { CreateBoardMemberDto} from '../dto/create-board-member.dto';
-import { UpdateBoardMemberDto } from '../dto/update-board-member.dto';
-import { User } from 'src/entities/users.entity';
 import { Board } from 'src/entities/boards.entity';
+import { User } from 'src/entities/users.entity';
+import { Repository } from 'typeorm';
+import { CreateBoardMemberDto } from '../dto/create-board-member.dto';
+import { UpdateBoardMemberDto } from '../dto/update-board-member.dto';
 
 @Injectable()
 export class BoardMembersService {
