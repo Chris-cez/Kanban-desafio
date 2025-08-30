@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Desafio Técnico Full Stack Cloud</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 40px;
+            background: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            color: #222;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #444;
+            border-bottom: 2px solid #f1c40f;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+        ul {
+            margin: 10px 0 20px 20px;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #f1c40f;
+            margin: 15px 0;
+        }
+        .extra {
+            background: #e8f8f5;
+            padding: 10px;
+            border-left: 4px solid #1abc9c;
+            margin: 15px 0;
+        }
+        code {
+            background: #eee;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Desafio Técnico: Plataforma de Lista de Tarefas Colaborativa</h1>
+
+    <div class="highlight">
+        <p><strong>Objetivo:</strong> Desenvolver uma aplicação completa cobrindo desenvolvimento, arquitetura, front, back, testes, CI/CD e provisionamento de infraestrutura em cloud utilizando IaC.</p>
+    </div>
+
+    <h2>📌 Descrição</h2>
+    <p>O candidato deve desenvolver uma aplicação de lista de tarefas colaborativa, onde usuários podem:</p>
+    <ul>
+        <li>Criar uma conta e autenticar-se.</li>
+        <li>Criar, editar e excluir tarefas.</li>
+        <li>Marcar tarefas como concluídas.</li>
+        <li>Ver tarefas em tempo real (polling simples já serve).</li>
+    </ul>
+
+    <h2>🏗️ Requisitos Técnicos</h2>
+
+    <h3>1. Arquitetura</h3>
+    <ul>
+        <li>Frontend: React + Next.js, hospedado em <strong>S3 + CloudFront</strong>.</li>
+        <li>Backend: API REST Node.js (Express ou NestJS), rodando em <strong>ECS (Fargate)</strong>.</li>
+        <li>Banco de Dados: <strong>Amazon RDS</strong>.</li>
+        <li>Documentar a arquitetura com um diagrama simples.</li>
+    </ul>
+
+    <h3>2. Desenvolvimento Frontend</h3>
+    <ul>
+        <li>Login/Logout e CRUD de tarefas.</li>
+        <li>Interface responsiva e amigável.</li>
+        <li>Consumo da API hospedada no ECS.</li>
+        <li>Deploy automatizado no S3 com CloudFront.</li>
+    </ul>
+
+    <h3>3. Desenvolvimento Backend</h3>
+    <ul>
+        <li>CRUD de tarefas, autenticação JWT, persistência em RDS.</li>
+        <li>Endpoint <code>/health</code> para monitoramento.</li>
+        <li>Deploy no ECS Fargate com Auto Scaling.</li>
+    </ul>
+
+    <h3>4. Testes</h3>
+    <ul>
+        <li>Frontend: Jest/RTL.</li>
+        <li>Backend: Jest/Supertest.</li>
+        <li>CI deve rodar os testes a cada push.</li>
+    </ul>
+
+    <h3>5. CI/CD</h3>
+    <ul>
+        <li>Pipeline executa testes, build e deploy.</li>
+        <li>Frontend → S3/CloudFront.</li>
+        <li>Backend → ECR/ECS.</li>
+        <li>Pode usar GitHub Actions, GitLab CI ou AWS CodePipeline.</li>
+    </ul>
+
+    <h3>6. Provisionamento de Infra (IaC)</h3>
+    <ul>
+        <li>Usar Terraform ou AWS CDK para criar:</li>
+        <ul>
+            <li>S3 + CloudFront.</li>
+            <li>ECS Fargate + ECR.</li>
+            <li>RDS.</li>
+            <li>VPC, Security Groups e demais recursos necessários.</li>
+        </ul>
+        <li>Configuração versionada e reutilizável.</li>
+    </ul>
+
+    <h2>✅ Critérios de Avaliação</h2>
+    <ul>
+        <li>Qualidade do código e boas práticas.</li>
+        <li>Estrutura e clareza da arquitetura.</li>
+        <li>Testes cobrindo cenários relevantes.</li>
+        <li>CI/CD funcionando.</li>
+        <li>Infra provisionada com IaC.</li>
+        <li>Documentação clara.</li>
+    </ul>
+
+    <div class="extra">
+        <h2>🔥 Extras (para se destacar)</h2>
+        <ul>
+            <li>Implementar WebSockets para tempo real.</li>
+            <li>Autenticação OAuth (ex.: login com Google).</li>
+            <li>Monitoramento e logs no CloudWatch.</li>
+            <li>Uso de feature flags.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

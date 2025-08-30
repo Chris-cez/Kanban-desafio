@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Task } from 'src/tasks/tasks.entity';
-import { BoardMember } from 'src/board-members/board-members.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Task } from './tasks.entity';
+import { BoardMember } from './board-members.entity';
 
 @Entity()
 export class User {
@@ -21,4 +21,10 @@ export class User {
 
   @OneToMany(() => BoardMember, boardMember => boardMember.user)
   boardMembers: BoardMember[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

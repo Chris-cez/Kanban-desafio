@@ -10,9 +10,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new Error('JWT_SECRET environment variable is not defined');
     }
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Onde buscar o token na requisição
-      ignoreExpiration: false, // Não ignora a expiração do token
-      secretOrKey: process.env.JWT_SECRET, // Chave secreta para assinar/validar o token
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 
@@ -21,7 +21,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException();
     }
-    // O que for retornado aqui é injetado em req.user nas rotas protegidas
     return user;
   }
 }
