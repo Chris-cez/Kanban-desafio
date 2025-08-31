@@ -1,18 +1,33 @@
-# compiled output
-/dist
-/node_modules
-/build
+# Node.js build output
+dist/
+build/
 
 # Logs
 logs
 *.log
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 lerna-debug.log*
 
-# OS
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Node.js (para backend e frontend)
+app/backend/node_modules/
+app/frontend/node_modules/
+app/backend/dist/
+app/frontend/.next/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
 .DS_Store
 
 # Tests
