@@ -1,0 +1,13 @@
+# Dependencies
+node_modules
+app/backend/node_modules
+app/frontend/node_modules
+
+# Build output
+app/backend/dist
+app/frontend/.next
+
+# Terraform state
+.terraform
+*.tfstate*
+infra/
