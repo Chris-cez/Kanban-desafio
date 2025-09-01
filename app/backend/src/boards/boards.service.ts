@@ -4,6 +4,7 @@ import { Board } from '../entities/boards.entity';
 import { Repository } from 'typeorm';
 import { CreateBoardDto } from '../dto/create-board.dto';
 import { UpdateBoardDto } from '../dto/update-board.dto';
+import { User } from 'src/entities/users.entity';
 
 @Injectable()
 export class BoardsService {
@@ -12,7 +13,7 @@ export class BoardsService {
     private boardRepository: Repository<Board>,
   ) {}
 
-  async create(dto: CreateBoardDto): Promise<Board> {
+  async create(dto: CreateBoardDto, user: User): Promise<Board> {
     const board = this.boardRepository.create({
       name: dto.name,
       taskStatuses: dto.taskStatuses && dto.taskStatuses.length > 0 ? dto.taskStatuses : ['todo', 'doing', 'done'],
@@ -20,8 +21,12 @@ export class BoardsService {
     return this.boardRepository.save(board);
   }
 
-  async findAll(): Promise<Board[]> {
-    return this.boardRepository.find({ relations: ['tasks', 'boardMembers'] });
+  async findAllForUser(userId: number): Promise<Board[]> {
+    return this.boardRepository
+      .createQueryBuilder('board')
+      .leftJoin('board.boardMembers', 'member')
+      .where('member.userId = :userId', { userId })
+      .getMany();
   }
 
   async findOne(id: number): Promise<Board> {

@@ -1,12 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Board } from '../entities/boards.entity';
 import { Repository } from 'typeorm';
+import { BoardMemberPermission } from '../dto/create-board-member.dto';
+import { BoardMember } from '../entities/board-members.entity';
+import { Board } from '../entities/boards.entity';
+import { User } from '../entities/users.entity';
 import { BoardsService } from './boards.service';
 
 describe('BoardsService', () => {
   let service: BoardsService;
-  let repo: jest.Mocked<Repository<Board>>;
+  let boardRepo: jest.Mocked<Repository<Board>>;
+  let boardMemberRepo: jest.Mocked<Repository<BoardMember>>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,59 +18,79 @@ describe('BoardsService', () => {
         BoardsService,
         {
           provide: getRepositoryToken(Board),
-          useValue: {
+          useValue: jest.fn(() => ({
             create: jest.fn(),
             save: jest.fn(),
-            find: jest.fn(),
             findOne: jest.fn(),
             delete: jest.fn(),
-          },
+            createQueryBuilder: jest.fn(),
+          }))(),
+        },
+        {
+          provide: getRepositoryToken(BoardMember),
+          useValue: jest.fn(() => ({
+            create: jest.fn(),
+            save: jest.fn(),
+          }))(),
         },
       ],
     }).compile();
 
     service = module.get<BoardsService>(BoardsService);
-    repo = module.get(getRepositoryToken(Board));
+    boardRepo = module.get(getRepositoryToken(Board));
+    boardMemberRepo = module.get(getRepositoryToken(BoardMember));
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should create a board with default statuses', async () => {
-    repo.create.mockImplementation((dto) => dto as any);
-    repo.save.mockResolvedValue({ id: 1, name: 'b', taskStatuses: ['todo', 'doing', 'done'] } as any);
+  it('should create a board and make the creator an admin', async () => {
+    const mockUser = { id: 1, login: 'test' } as User;
+    const createDto = { name: 'Test Board' };
+    const savedBoard = { id: 1, ...createDto, taskStatuses: ['todo', 'doing', 'done'] } as Board;
 
-    const result = await service.create({ name: 'b' });
+    boardRepo.create.mockReturnValue(createDto as any);
+    boardRepo.save.mockResolvedValue(savedBoard);
+    boardMemberRepo.create.mockImplementation((dto) => dto as any);
+    boardMemberRepo.save.mockResolvedValue({} as any);
+
+    const result = await service.create(createDto, mockUser);
+
     expect(result).toHaveProperty('id');
-    expect(result.taskStatuses).toContain('todo');
-    expect(repo.create).toHaveBeenCalled();
-    expect(repo.save).toHaveBeenCalled();
+    expect(boardRepo.create).toHaveBeenCalledWith(expect.objectContaining({ name: 'Test Board' }));
+    expect(boardRepo.save).toHaveBeenCalled();
+    expect(boardMemberRepo.create).toHaveBeenCalledWith({
+      board: savedBoard,
+      user: mockUser,
+      permissions: BoardMemberPermission.ADMIN,
+    });
+    expect(boardMemberRepo.save).toHaveBeenCalled();
   });
 
-  it('should create a board with custom statuses', async () => {
-    repo.create.mockImplementation((dto) => dto as any);
-    repo.save.mockResolvedValue({ id: 2, name: 'b', taskStatuses: ['a', 'b'] } as any);
+  it('should find all boards for a user', async () => {
+    const mockBoards = [{ id: 1, name: 'User Board' }] as Board[];
+    const mockQueryBuilder = {
+      leftJoin: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue(mockBoards),
+    };
+    boardRepo.createQueryBuilder.mockReturnValue(mockQueryBuilder as any);
 
-    const result = await service.create({ name: 'b', taskStatuses: ['a', 'b'] });
-    expect(result.taskStatuses).toEqual(['a', 'b']);
-  });
-
-  it('should find all boards', async () => {
-    repo.find.mockResolvedValue([{ id: 1, name: 'b' }] as any);
-    const result = await service.findAll();
-    expect(result.length).toBeGreaterThan(0);
-    expect(repo.find).toHaveBeenCalled();
+    const result = await service.findAllForUser(1);
+    expect(result).toEqual(mockBoards);
+    expect(boardRepo.createQueryBuilder).toHaveBeenCalledWith('board');
+    expect(mockQueryBuilder.where).toHaveBeenCalledWith('member.userId = :userId', { userId: 1 });
   });
 
   it('should throw if board not found', async () => {
-    repo.findOne.mockResolvedValue(null);
+    boardRepo.findOne.mockResolvedValue(null);
     await expect(service.findOne(99)).rejects.toThrow('Board not found');
   });
 
   it('should update board name and statuses', async () => {
-    repo.findOne.mockResolvedValue({ id: 1, name: 'old', taskStatuses: ['todo'] } as any);
-    repo.save.mockResolvedValue({ id: 1, name: 'new', taskStatuses: ['a', 'b'] } as any);
+    boardRepo.findOne.mockResolvedValue({ id: 1, name: 'old', taskStatuses: ['todo'] } as any);
+    boardRepo.save.mockResolvedValue({ id: 1, name: 'new', taskStatuses: ['a', 'b'] } as any);
 
     const result = await service.update(1, { name: 'new', taskStatuses: ['a', 'b'] });
     expect(result.name).toBe('new');
@@ -74,12 +98,12 @@ describe('BoardsService', () => {
   });
 
   it('should remove a board', async () => {
-    repo.delete.mockResolvedValue({ affected: 1, raw: {} });
+    boardRepo.delete.mockResolvedValue({ affected: 1, raw: {} });
     await expect(service.remove(1)).resolves.toBeUndefined();
   });
 
   it('should throw on remove if not found', async () => {
-    repo.delete.mockResolvedValue({ affected: 0, raw: {} });
+    boardRepo.delete.mockResolvedValue({ affected: 0, raw: {} });
     await expect(service.remove(99)).rejects.toThrow('Board not found');
   });
 });
