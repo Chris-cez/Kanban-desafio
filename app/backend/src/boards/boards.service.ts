@@ -1,16 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Board } from '../entities/boards.entity';
-import { Repository } from 'typeorm';
 import { CreateBoardDto } from '../dto/create-board.dto';
 import { UpdateBoardDto } from '../dto/update-board.dto';
-import { User } from 'src/entities/users.entity';
+import { User } from '../entities/users.entity';
+import { Repository } from 'typeorm';
+import { BoardMember } from '../entities/board-members.entity';
+import { BoardMemberPermission } from '../dto/create-board-member.dto';
 
 @Injectable()
 export class BoardsService {
   constructor(
     @InjectRepository(Board)
     private boardRepository: Repository<Board>,
+    @InjectRepository(BoardMember)
+    private boardMemberRepository: Repository<BoardMember>,
   ) {}
 
   async create(dto: CreateBoardDto, user: User): Promise<Board> {
@@ -18,7 +22,17 @@ export class BoardsService {
       name: dto.name,
       taskStatuses: dto.taskStatuses && dto.taskStatuses.length > 0 ? dto.taskStatuses : ['todo', 'doing', 'done'],
     });
-    return this.boardRepository.save(board);
+    const savedBoard = await this.boardRepository.save(board);
+
+    // Adiciona o criador como admin do quadro
+    const adminMembership = this.boardMemberRepository.create({
+      board: savedBoard,
+      user: user,
+      permissions: BoardMemberPermission.ADMIN,
+    });
+    await this.boardMemberRepository.save(adminMembership);
+
+    return savedBoard;
   }
 
   async findAllForUser(userId: number): Promise<Board[]> {

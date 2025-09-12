@@ -15,7 +15,4 @@ export class CreateTaskDto {
 
     @IsInt()
     boardId: number;
-
-    @IsInt()
-    creatorId: number;
 }

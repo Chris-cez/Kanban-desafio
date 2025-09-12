@@ -8,6 +8,12 @@ import { Repository } from 'typeorm';
 export const PERMISSIONS_KEY = 'permissions';
 export const Permissions = (...permissions: BoardMemberPermission[]) => SetMetadata(PERMISSIONS_KEY, permissions);
 
+const PERMISSION_HIERARCHY: Record<BoardMemberPermission, number> = {
+  [BoardMemberPermission.READ]: 1,
+  [BoardMemberPermission.WRITE]: 2,
+  [BoardMemberPermission.ADMIN]: 3,
+};
+
 @Injectable()
 export class BoardMemberGuard implements CanActivate {
   constructor(
@@ -47,7 +53,12 @@ export class BoardMemberGuard implements CanActivate {
       throw new NotFoundException('You are not a member of this board.');
     }
 
-    const hasPermission = requiredPermissions.some((permission) => boardMembership.permissions === permission);
+    const userPermissionLevel = PERMISSION_HIERARCHY[boardMembership.permissions];
+
+    const hasPermission = requiredPermissions.some((requiredPermission) => {
+      const requiredLevel = PERMISSION_HIERARCHY[requiredPermission];
+      return userPermissionLevel >= requiredLevel;
+    });
 
     if (!hasPermission) {
       throw new ForbiddenException('You do not have the required permissions for this action.');

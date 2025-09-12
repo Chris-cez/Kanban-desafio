@@ -7,6 +7,9 @@ describe('BoardMembersController (e2e)', () => {
   let app: INestApplication;
   let jwt: string;
   let userId: number;
+  let userLogin: string;
+  let otherUserLogin: string;
+  let thirdUserLogin: string;
   let otherUserId: number;
   let thirdUserId: number;
   let boardId: number;
@@ -21,29 +24,32 @@ describe('BoardMembersController (e2e)', () => {
     await app.init();
 
     const uniqueSuffix = Date.now();
+    userLogin = `memberuser-${uniqueSuffix}`;
+    otherUserLogin = `othermemberuser-${uniqueSuffix}`;
+    thirdUserLogin = `thirdmemberuser-${uniqueSuffix}`;
 
     // Registre e faça login para obter um token JWT
     const userRes = await request(app.getHttpServer())
       .post('/users/register')
-      .send({ login: `memberuser-${uniqueSuffix}`, password: 'memberpassword' });
+      .send({ login: userLogin, password: 'memberpassword' });
     expect(userRes.status).toBe(201);
     userId = userRes.body.id;
 
     const otherUserRes = await request(app.getHttpServer())
       .post('/users/register')
-      .send({ login: `othermemberuser-${uniqueSuffix}`, password: 'othermemberpassword' });
+      .send({ login: otherUserLogin, password: 'othermemberpassword' });
     expect(otherUserRes.status).toBe(201);
     otherUserId = otherUserRes.body.id;
 
     const thirdUserRes = await request(app.getHttpServer())
       .post('/users/register')
-      .send({ login: `thirdmemberuser-${uniqueSuffix}`, password: 'thirdmemberpassword' });
+      .send({ login: thirdUserLogin, password: 'thirdmemberpassword' });
     expect(thirdUserRes.status).toBe(201);
     thirdUserId = thirdUserRes.body.id;
 
     const loginRes = await request(app.getHttpServer())
       .post('/auth/login')
-      .send({ login: `memberuser-${uniqueSuffix}`, password: 'memberpassword' });
+      .send({ login: userLogin, password: 'memberpassword' });
 
     jwt = loginRes.body.access_token;
 
@@ -60,7 +66,7 @@ describe('BoardMembersController (e2e)', () => {
     const res = await request(app.getHttpServer())
       .post('/board-members')
       .set('Authorization', `Bearer ${jwt}`)
-      .send({ userId, boardId, permissions: 'admin' });
+      .send({ userLogin, boardId, permissions: 'admin' });
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('id');
@@ -80,7 +86,7 @@ describe('BoardMembersController (e2e)', () => {
     const addRes = await request(app.getHttpServer())
       .post('/board-members')
       .set('Authorization', `Bearer ${jwt}`)
-      .send({ userId: otherUserId, boardId, permissions: 'read' });
+      .send({ userLogin: otherUserLogin, boardId, permissions: 'read' });
 
     expect(addRes.status).toBe(201);
     const memberId = addRes.body.id;
@@ -99,7 +105,7 @@ describe('BoardMembersController (e2e)', () => {
     const addRes = await request(app.getHttpServer())
       .post('/board-members')
       .set('Authorization', `Bearer ${jwt}`)
-      .send({ userId: thirdUserId, boardId, permissions: 'read' });
+      .send({ userLogin: thirdUserLogin, boardId, permissions: 'read' });
 
     expect(addRes.status).toBe(201);
     const memberId = addRes.body.id;

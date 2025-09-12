@@ -18,7 +18,7 @@ export class TasksService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createTaskDto: CreateTaskDto): Promise<Task> {
+  async create(createTaskDto: CreateTaskDto, creator: User): Promise<Task> {
     const board = await this.boardRepository.findOne({ where: { id: createTaskDto.boardId } });
     if (!board) throw new NotFoundException('Board not found');
 
@@ -28,9 +28,6 @@ export class TasksService {
     ) {
       throw new BadRequestException('Invalid status for this board');
     }
-
-    const creator = await this.userRepository.findOne({ where: { id: createTaskDto.creatorId } });
-    if (!creator) throw new NotFoundException('Creator not found');
 
     const task = this.taskRepository.create({
       ...createTaskDto,
