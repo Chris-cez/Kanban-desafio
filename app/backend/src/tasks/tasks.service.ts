@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateTaskDto } from '../dto/create-task.dto';
+import { UpdateTaskDto } from '../dto/update-task.dto';
 import { Board } from '../entities/boards.entity';
 import { Task } from '../entities/tasks.entity';
 import { User } from '../entities/users.entity';
 import { Repository } from 'typeorm';
-import { CreateTaskDto } from '../dto/create-task.dto';
-import { UpdateTaskDto } from '../dto/update-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -15,25 +15,23 @@ export class TasksService {
     @InjectRepository(Board)
     private boardRepository: Repository<Board>,
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private userRepository: Repository<User>, // Mantido para futuras implementações como 'finalizer'
   ) {}
 
-  async create(createTaskDto: CreateTaskDto, creator: User): Promise<Task> {
-    const board = await this.boardRepository.findOne({ where: { id: createTaskDto.boardId } });
-    if (!board) throw new NotFoundException('Board not found');
+  async create(dto: CreateTaskDto, creator: User): Promise<Task> {
+    const board = await this.boardRepository.findOneBy({ id: dto.boardId });
+    if (!board) throw new NotFoundException(`Board with ID ${dto.boardId} not found`);
 
-    if (
-      createTaskDto.status &&
-      !board.taskStatuses.includes(createTaskDto.status)
-    ) {
+    if (dto.status && !board.taskStatuses.includes(dto.status)) {
       throw new BadRequestException('Invalid status for this board');
     }
 
     const task = this.taskRepository.create({
-      ...createTaskDto,
+      ...dto,
       board,
       creator,
     });
+
     return this.taskRepository.save(task);
   }
 
@@ -50,34 +48,23 @@ export class TasksService {
       where: { id },
       relations: ['board', 'creator', 'finalizer'],
     });
-    if (!task) throw new NotFoundException('Task not found');
+    if (!task) throw new NotFoundException(`Task with ID ${id} not found`);
     return task;
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
-    const task = await this.findOne(id);
+  async update(id: number, dto: UpdateTaskDto): Promise<Task> {
+    // Usamos findOne para garantir que as relações (como 'board') sejam carregadas
+    const task = await this.findOne(id); 
 
-    if (updateTaskDto.status) {
-      const board = await this.boardRepository.findOne({ where: { id: task.board.id } });
-      if (!board || !board.taskStatuses.includes(updateTaskDto.status)) {
+    if (dto.status) {
+      // A relação 'task.board' já foi carregada pelo findOne
+      if (!task.board.taskStatuses.includes(dto.status)) {
         throw new BadRequestException('Invalid status for this board');
       }
-      task.status = updateTaskDto.status;
     }
 
-    if (updateTaskDto.name !== undefined) task.name = updateTaskDto.name;
-    if (updateTaskDto.description !== undefined) task.description = updateTaskDto.description;
-    if (updateTaskDto.archived !== undefined) task.archived = updateTaskDto.archived;
-
-    if (updateTaskDto.finalizerId !== undefined) {
-      if (updateTaskDto.finalizerId === null) {
-        task.finalizer = null;
-      } else {
-        const finalizer = await this.userRepository.findOne({ where: { id: updateTaskDto.finalizerId } });
-        if (!finalizer) throw new NotFoundException('Finalizer not found');
-        task.finalizer = finalizer;
-      }
-    }
+    // Object.assign é uma forma limpa de mesclar as propriedades do DTO na entidade
+    Object.assign(task, dto);
 
     return this.taskRepository.save(task);
   }

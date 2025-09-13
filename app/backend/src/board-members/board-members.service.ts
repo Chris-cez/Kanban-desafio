@@ -79,11 +79,9 @@ export class BoardMembersService {
       board: { id: memberToRemove.board.id },
     });
 
-    const isSelfRemoval = memberToRemove.user.id === requestingUser.id;
     const isAdmin = requesterMembership?.permissions === BoardMemberPermission.ADMIN;
-
-    if (!isSelfRemoval && !isAdmin) {
-      throw new ForbiddenException('You can only remove yourself or be removed by an admin.');
+    if (!isAdmin) {
+      throw new ForbiddenException('Only board admins can remove members.');
     }
 
     // Impede que o último admin seja removido

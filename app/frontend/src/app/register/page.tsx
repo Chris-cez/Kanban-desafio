@@ -14,10 +14,10 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
 
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/users/register`;
-
     try {
-      const res = await fetch(apiUrl, {
+      // Etapa 1: Registrar o usuário
+      const registerApiUrl = `${process.env.NEXT_PUBLIC_API_URL}/users/register`;
+      const registerRes = await fetch(registerApiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -25,13 +25,34 @@ export default function RegisterPage() {
         body: JSON.stringify({ login, password }),
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
+      if (!registerRes.ok) {
+        const errorData = await registerRes.json();
         throw new Error(errorData.message || 'Falha ao registrar');
       }
 
-      // Redireciona para a página de login após o sucesso
-      router.push('/login');
+      // Etapa 2: Fazer o login automaticamente após o registro
+      const loginApiUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
+      const loginRes = await fetch(loginApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ login, password }),
+      });
+
+      if (!loginRes.ok) {
+        // Se o login falhar após um registro bem-sucedido, é uma situação inesperada.
+        // O melhor a fazer é redirecionar para a página de login para uma tentativa manual.
+        alert('Registro realizado com sucesso! Redirecionando para o login.');
+        router.push('/login');
+        return;
+      }
+
+      const loginData = await loginRes.json();
+
+      // Etapa 3: Armazenar o token e redirecionar para o dashboard
+      localStorage.setItem('access_token', loginData.access_token);
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
     }

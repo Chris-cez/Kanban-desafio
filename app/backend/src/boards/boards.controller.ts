@@ -27,8 +27,8 @@ export class BoardsController {
   @Get(':id')
   @UseGuards(BoardMemberGuard)
   @Permissions(BoardMemberPermission.READ, BoardMemberPermission.WRITE, BoardMemberPermission.ADMIN)
-  async findOne(@Param('id') id: number) {
-    return this.boardsService.findOne(Number(id));
+  async findOne(@Param('id') id: number, @GetUser() user: User) {
+    return this.boardsService.findOne(Number(id), user.id);
   }
 
   @Patch(':id')

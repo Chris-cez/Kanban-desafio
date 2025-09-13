@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import CreateBoardModal from '../components/CreateBoardModal';
 import DeleteBoardModal from '../components/DeleteBoardModal';
 import ManageMembersModal from '../components/ManageMembersModal';
+import ArchivedTasksModal from '../components/ArchivedTasksModal';
 import { useRouter } from 'next/navigation';
 
 // Definindo um tipo para o Board para melhor manutenibilidade
@@ -20,6 +21,7 @@ export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [managingBoardId, setManagingBoardId] = useState<number | null>(null);
   const [deletingBoardId, setDeletingBoardId] = useState<number | null>(null);
+  const [archivedBoardId, setArchivedBoardId] = useState<number | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -73,6 +75,10 @@ export default function DashboardPage() {
           setBoards((prevBoards) => prevBoards.filter((b) => b.id !== deletedId));
         }}
       />
+      <ArchivedTasksModal
+        boardId={archivedBoardId}
+        onClose={() => setArchivedBoardId(null)}
+      />
       <header className="bg-white dark:bg-gray-800 shadow p-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Seus Quadros</h1>
         <button
@@ -95,6 +101,9 @@ export default function DashboardPage() {
             >
               <h2 className="text-xl font-semibold mb-2">{board.name}</h2>
               <div className="flex justify-end gap-2 mt-4">
+                <button onClick={() => setArchivedBoardId(board.id)} className="text-sm text-gray-500 hover:underline">
+                  Arquivados
+                </button>
                 <button onClick={() => setManagingBoardId(board.id)} className="text-sm text-blue-500 hover:underline">
                   Convidar
                 </button>

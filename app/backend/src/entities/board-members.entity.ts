@@ -15,7 +15,7 @@ export class BoardMember {
   @ManyToOne(() => User, user => user.boardMembers)
   user: User;
 
-  @ManyToOne(() => Board, board => board.boardMembers)
+  @ManyToOne(() => Board, board => board.boardMembers, { onDelete: 'CASCADE' })
   board: Board;
 
   @CreateDateColumn()

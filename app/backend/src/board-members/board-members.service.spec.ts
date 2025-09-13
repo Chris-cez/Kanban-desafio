@@ -19,8 +19,8 @@ describe('BoardMembersService', () => {
       providers: [
         BoardMembersService,
         { provide: getRepositoryToken(BoardMember), useValue: { create: jest.fn(), save: jest.fn(), find: jest.fn(), findOne: jest.fn(), remove: jest.fn(), findOneBy: jest.fn(), countBy: jest.fn() } },
-        { provide: getRepositoryToken(User), useValue: { findOne: jest.fn() } },
-        { provide: getRepositoryToken(Board), useValue: { findOne: jest.fn() } },
+        { provide: getRepositoryToken(User), useValue: { findOne: jest.fn(), findOneBy: jest.fn() } },
+        { provide: getRepositoryToken(Board), useValue: { findOne: jest.fn(), findOneBy: jest.fn() } },
       ],
     }).compile();
 
@@ -38,26 +38,26 @@ describe('BoardMembersService', () => {
     const dto: CreateBoardMemberDto = { userLogin: 'testuser', boardId: 1, permissions: BoardMemberPermission.ADMIN };
 
     it('should throw if user not found', async () => {
-      userRepo.findOne.mockResolvedValue(null);
+      userRepo.findOneBy.mockResolvedValue(null);
       await expect(service.addMember(dto)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw if board not found', async () => {
-      userRepo.findOne.mockResolvedValue({ id: 1 } as User);
-      boardRepo.findOne.mockResolvedValue(null);
+      userRepo.findOneBy.mockResolvedValue({ id: 1 } as User);
+      boardRepo.findOneBy.mockResolvedValue(null);
       await expect(service.addMember(dto)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw if user is already a member', async () => {
-      userRepo.findOne.mockResolvedValue({ id: 1 } as User);
-      boardRepo.findOne.mockResolvedValue({ id: 1 } as Board);
+      userRepo.findOneBy.mockResolvedValue({ id: 1 } as User);
+      boardRepo.findOneBy.mockResolvedValue({ id: 1 } as Board);
       boardMemberRepo.findOne.mockResolvedValue({ id: 1 } as BoardMember);
       await expect(service.addMember(dto)).rejects.toThrow(ConflictException);
     });
 
     it('should add a member successfully', async () => {
-      userRepo.findOne.mockResolvedValue({ id: 1 } as User);
-      boardRepo.findOne.mockResolvedValue({ id: 1 } as Board);
+      userRepo.findOneBy.mockResolvedValue({ id: 1 } as User);
+      boardRepo.findOneBy.mockResolvedValue({ id: 1 } as Board);
       boardMemberRepo.findOne.mockResolvedValue(null);
       boardMemberRepo.create.mockImplementation((d) => d as any);
       boardMemberRepo.save.mockResolvedValue({ id: 1, ...dto } as any);

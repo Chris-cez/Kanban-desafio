@@ -22,6 +22,7 @@ describe('BoardsService', () => {
             create: jest.fn(),
             save: jest.fn(),
             findOne: jest.fn(),
+            findOneBy: jest.fn(),
             delete: jest.fn(),
             createQueryBuilder: jest.fn(),
           }))(),
@@ -85,11 +86,11 @@ describe('BoardsService', () => {
 
   it('should throw if board not found', async () => {
     boardRepo.findOne.mockResolvedValue(null);
-    await expect(service.findOne(99)).rejects.toThrow('Board not found');
+    await expect(service.findOne(99, 1)).rejects.toThrow('Board not found');
   });
 
   it('should update board name and statuses', async () => {
-    boardRepo.findOne.mockResolvedValue({ id: 1, name: 'old', taskStatuses: ['todo'] } as any);
+    boardRepo.findOneBy.mockResolvedValue({ id: 1, name: 'old', taskStatuses: ['todo'] } as any);
     boardRepo.save.mockResolvedValue({ id: 1, name: 'new', taskStatuses: ['a', 'b'] } as any);
 
     const result = await service.update(1, { name: 'new', taskStatuses: ['a', 'b'] });

@@ -43,17 +43,27 @@ export class BoardsService {
       .getMany();
   }
 
-  async findOne(id: number): Promise<Board> {
+  async findOne(id: number, userId: number): Promise<Board & { currentUserPermission?: BoardMemberPermission }> {
     const board = await this.boardRepository.findOne({
       where: { id },
       relations: ['tasks', 'boardMembers'],
     });
     if (!board) throw new NotFoundException('Board not found');
-    return board;
+
+    const membership = await this.boardMemberRepository.findOneBy({
+      board: { id: id },
+      user: { id: userId },
+    });
+
+    return {
+      ...board,
+      currentUserPermission: membership?.permissions,
+    };
   }
 
   async update(id: number, dto: UpdateBoardDto): Promise<Board> {
-    const board = await this.findOne(id);
+    const board = await this.boardRepository.findOneBy({ id });
+    if (!board) throw new NotFoundException(`Board with ID ${id} not found`);
     if (dto.name !== undefined) board.name = dto.name;
     if (dto.taskStatuses !== undefined && dto.taskStatuses.length > 0) {
       board.taskStatuses = dto.taskStatuses;

@@ -62,11 +62,11 @@ describe('BoardMembersController (e2e)', () => {
     boardId = boardRes.body.id;
   });
 
-  it('/board-members (POST) - deve adicionar membro', async () => {
+  it('/board-members (POST) - deve adicionar outro usuário como membro', async () => {
     const res = await request(app.getHttpServer())
       .post('/board-members')
       .set('Authorization', `Bearer ${jwt}`)
-      .send({ userLogin, boardId, permissions: 'admin' });
+      .send({ userLogin: otherUserLogin, boardId, permissions: 'read' });
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('id');
@@ -86,7 +86,7 @@ describe('BoardMembersController (e2e)', () => {
     const addRes = await request(app.getHttpServer())
       .post('/board-members')
       .set('Authorization', `Bearer ${jwt}`)
-      .send({ userLogin: otherUserLogin, boardId, permissions: 'read' });
+      .send({ userLogin: thirdUserLogin, boardId, permissions: 'read' });
 
     expect(addRes.status).toBe(201);
     const memberId = addRes.body.id;
@@ -101,11 +101,16 @@ describe('BoardMembersController (e2e)', () => {
   });
 
   it('/board-members/:id (DELETE) - deve remover membro', async () => {
-    // Adicione um membro para remover
+    // Adiciona um membro para remover, garantindo que o teste seja independente
+    const userToDeleteLogin = `user-to-delete-${Date.now()}`;
+    await request(app.getHttpServer())
+      .post('/users/register')
+      .send({ login: userToDeleteLogin, password: 'password' });
+
     const addRes = await request(app.getHttpServer())
       .post('/board-members')
       .set('Authorization', `Bearer ${jwt}`)
-      .send({ userLogin: thirdUserLogin, boardId, permissions: 'read' });
+      .send({ userLogin: userToDeleteLogin, boardId, permissions: 'read' });
 
     expect(addRes.status).toBe(201);
     const memberId = addRes.body.id;

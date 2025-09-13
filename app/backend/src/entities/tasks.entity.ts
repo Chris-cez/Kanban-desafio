@@ -19,7 +19,7 @@ export class Task {
   @Column({ default: false })
   archived: boolean;
 
-  @ManyToOne(() => Board, board => board.tasks)
+  @ManyToOne(() => Board, board => board.tasks, { onDelete: 'CASCADE' })
   board: Board;
 
   @ManyToOne(() => User, user => user.createdTasks)

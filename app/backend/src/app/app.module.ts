@@ -12,7 +12,11 @@ import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot(
+      {
+        isGlobal: true,
+      }
+    ),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST ?? 'localhost',
@@ -23,11 +27,11 @@ import { AuthModule } from '../auth/auth.module';
       entities: [__dirname + '/../entities/*.entity.{ts,js}'],
       synchronize: true,
     }),
+    TasksModule,
+    AuthModule,
     UsersModule,
     BoardsModule,
     BoardMembersModule,
-    TasksModule,
-    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

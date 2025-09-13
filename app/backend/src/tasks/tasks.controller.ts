@@ -37,14 +37,16 @@ export class TasksController {
   }
 
   @Patch(':id')
-  // A autorização para update/delete é feita dentro do serviço
-  // para garantir que temos o boardId correto a partir da tarefa.
+  @UseGuards(BoardMemberGuard)
+  @Permissions(BoardMemberPermission.WRITE, BoardMemberPermission.ADMIN)
   async update(@Param('id') id: number, @Body() dto: UpdateTaskDto) {
     return this.tasksService.update(Number(id), dto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BoardMemberGuard)
+  @Permissions(BoardMemberPermission.WRITE, BoardMemberPermission.ADMIN)
   async remove(@Param('id') id: number) {
     await this.tasksService.remove(Number(id));
   }

@@ -53,6 +53,9 @@ export default function CreateBoardModal({ isOpen, onClose, onBoardCreated }: Cr
       const newBoard = await res.json();
       onBoardCreated(newBoard);
       onClose();
+      // Resetar o estado do formulário para a próxima vez que o modal for aberto
+      setName('');
+      setStatuses('todo,doing,done');
     } catch (err: any) {
       setError(err.message);
     } finally {

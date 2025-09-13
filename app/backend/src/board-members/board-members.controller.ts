@@ -30,12 +30,16 @@ export class BoardMembersController {
   }
 
   @Patch(':id')
+  @UseGuards(BoardMemberGuard)
+  @Permissions(BoardMemberPermission.ADMIN)
   async updatePermissions(@Param('id') id: number, @Body() dto: UpdateBoardMemberDto, @GetUser() user: User) {
     return this.boardMembersService.updatePermissions(id, dto, user);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BoardMemberGuard)
+  @Permissions(BoardMemberPermission.ADMIN)
   async removeMember(@Param('id') id: number, @GetUser() user: User) {
     await this.boardMembersService.removeMember(id, user);
   }

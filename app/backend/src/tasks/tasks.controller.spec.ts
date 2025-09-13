@@ -41,7 +41,6 @@ describe('TasksController (e2e)', () => {
         name: 'Minha tarefa',
         status: 'todo',
         boardId: boardRes.body.id,
-        creatorId: 1,
       });
 
     expect(res.status).toBe(201);
