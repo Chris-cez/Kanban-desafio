@@ -1,10 +1,17 @@
 import { defineConfig } from 'cypress';
 import { Pool } from 'pg';
+import dotenv from 'dotenv';
+
+// Carrega as variáveis de ambiente do arquivo .env.local
+dotenv.config({ path: '.env.local' });
 
 export default defineConfig({
   e2e: {
     // Define a URL base da sua aplicação para evitar repeti-la nos testes.
-    baseUrl: 'http://localhost:3000',
+    baseUrl: 'http://localhost:3001',
+    // Informa ao Cypress que não estamos usando um arquivo de suporte (supportFile).
+    // Isso resolve o erro "support file missing or invalid".
+    supportFile: false,
     setupNodeEvents(on, config) {
       // Configuração da pool de conexão com o banco de dados de teste
       // As variáveis de ambiente devem ser configuradas no seu ambiente de teste

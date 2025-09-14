@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 describe('Fluxo de Integração Completo (Full Stack)', () => {
   beforeEach(() => {
     // Antes de cada teste, chamamos nossa tarefa para limpar o banco de dados.

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    // Isola os tipos do Cypress, impedindo que vazem para o resto do projeto.
+    "types": ["cypress", "node"],
+    // Configurações mínimas para o TypeScript entender os arquivos do Cypress.
+    "target": "es5",
+    "lib": ["es5", "dom"],
+    "esModuleInterop": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
+}

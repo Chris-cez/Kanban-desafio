@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 describe('Fluxo de Autenticação e Criação de Quadro', () => {
   // Usaremos um login único para cada execução de teste para evitar conflitos
   const userLogin = `testuser_${Date.now()}`;
