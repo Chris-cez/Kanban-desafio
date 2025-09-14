@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DashboardPage from './page';
 
@@ -94,19 +94,22 @@ describe('DashboardPage', () => {
       json: () => Promise.resolve(mockBoards),
     } as Response);
     render(<DashboardPage />);
-    const boardCard = await screen.findByText('Meu Primeiro Quadro');
-    const boardContainer = boardCard.parentElement!;
+    const boardCardHeading = await screen.findByText('Meu Primeiro Quadro');
+    // Encontra o container do card para limitar a busca dos botões
+    const boardContainer = boardCardHeading.closest('div[class*="bg-white"]') as HTMLElement;
+    expect(boardContainer).toBeInTheDocument();
 
     // Teste do modal de arquivados
-    await userEvent.click(screen.getByRole('button', { name: /Arquivados/i }));
+    await userEvent.click(within(boardContainer!).getByRole('button', { name: /Arquivados/i }));
     expect(await screen.findByTestId('archived-tasks-modal')).toHaveTextContent('Arquivados 1');
 
     // Teste do modal de convidar
-    await userEvent.click(screen.getByRole('button', { name: /Convidar/i }));
+    // Precisamos fechar o modal anterior para clicar no próximo botão
+    await userEvent.click(within(boardContainer!).getByRole('button', { name: /Convidar/i }));
     expect(await screen.findByTestId('manage-members-modal')).toHaveTextContent('Gerenciar Membros 1');
 
     // Teste do modal de deletar
-    await userEvent.click(screen.getByRole('button', { name: /Deletar/i }));
+    await userEvent.click(within(boardContainer!).getByRole('button', { name: /Deletar/i }));
     expect(await screen.findByTestId('delete-board-modal')).toHaveTextContent('Deletar Quadro 1');
   });
 

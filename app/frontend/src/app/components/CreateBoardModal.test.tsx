@@ -45,7 +45,9 @@ describe('CreateBoardModal', () => {
     render(<CreateBoardModal isOpen={true} onClose={handleClose} onBoardCreated={handleBoardCreated} />);
 
     await userEvent.type(screen.getByLabelText(/Nome do Quadro/i), 'Novo Quadro');
-    await userEvent.type(screen.getByLabelText(/Status das Tarefas/i), 'A Fazer');
+    const statusesInput = screen.getByLabelText(/Status das Tarefas/i);
+    await userEvent.clear(statusesInput); // Limpa o valor padrão do input
+    await userEvent.type(statusesInput, 'A Fazer');
     await userEvent.click(screen.getByRole('button', { name: /Criar Quadro/i }));
 
     expect(fetchMock).toHaveBeenCalledWith(
