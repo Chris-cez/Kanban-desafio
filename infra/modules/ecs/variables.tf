@@ -32,9 +32,27 @@ variable "app_port" {
 # ATENÇÃO: Estas variáveis são para as credenciais.
 # Em um projeto real, use o AWS Secrets Manager.
 # Por agora, vamos passar via terminal para não deixá-las no código.
-variable "database_host" { type = string; sensitive = true }
-variable "database_port" { type = string; sensitive = true }
-variable "database_user" { type = string; sensitive = true }
-variable "database_password" { type = string; sensitive = true }
-variable "database_name" { type = string; sensitive = true }
-variable "jwt_secret" { type = string; sensitive = true }
+variable "database_host" {
+  type      = string
+  sensitive = true
+}
+variable "database_port" {
+  type      = string
+  sensitive = true
+}
+variable "database_user" {
+  type      = string
+  sensitive = true
+}
+variable "database_password" {
+  type      = string
+  sensitive = true
+}
+variable "database_name" {
+  type      = string
+  sensitive = true
+}
+variable "jwt_secret" {
+  type      = string
+  sensitive = true
+}

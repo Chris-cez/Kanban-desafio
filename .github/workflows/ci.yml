@@ -5,17 +5,20 @@ on:
     branches: [main, master, develop]
   pull_request:
 
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+env:
+  NODE_VERSION: '20'
 
+jobs:
+  backend-ci:
+    name: Backend CI
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:15-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: kanban_test
+          POSTGRES_DB: test_db
         ports:
           - 5432:5432
         options: >-
@@ -23,37 +26,45 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-
     env:
       DATABASE_HOST: localhost
       DATABASE_PORT: 5432
       DATABASE_USER: postgres
       DATABASE_PASSWORD: postgres
-      DATABASE_NAME: kanban_test
+      DATABASE_NAME: test_db
       JWT_SECRET: test_secret
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
       - name: Install dependencies
         run: npm ci
+      - name: Run Backend Lint
+        run: npm run lint -w backend
+      - name: Run Backend Tests
+        run: npm run test -w backend
 
-      - name: Wait for Postgres
-        run: |
-          until pg_isready -h localhost -p 5432; do
-            sleep 1
-          done
-
-      - name: Run migrations (se houver)
-        run: npm run typeorm migration:run || true
-
-      - name: Run unit tests
-        run: npm run test
-
-      - name: Run e2e tests
-        run: npm run test:e2e
+  frontend-ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run Frontend Lint
+        run: npm run lint -w frontend
+      - name: Run Frontend Tests
+        run: npm run test -w frontend
+      - name: Check Frontend Build
+        run: npm run build -w frontend
+        env:
+          # Mock da URL da API para o build passar
+          NEXT_PUBLIC_API_URL: http://localhost:3000

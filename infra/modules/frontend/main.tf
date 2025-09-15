@@ -4,30 +4,37 @@ resource "aws_s3_bucket" "site" {
   bucket = "${var.project_name}-frontend-bucket-${random_string.bucket_suffix.result}"
 }
 
+# Bloqueia todo o acesso público ao bucket S3.
+resource "aws_s3_bucket_public_access_block" "site" {
+  bucket = aws_s3_bucket.site.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 # Permite que o CloudFront acesse o bucket S3 de forma segura
 resource "aws_s3_bucket_policy" "allow_cloudfront" {
   bucket = aws_s3_bucket.site.id
   policy = data.aws_iam_policy_document.allow_cloudfront.json
 }
 
-# Configura o bucket para ser um site estático
-resource "aws_s3_bucket_website_configuration" "site" {
-  bucket = aws_s3_bucket.site.id
-
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "index.html" # Redireciona todos os erros para o index.html (bom para SPAs)
-  }
+# OAC é a forma moderna e recomendada de dar acesso ao CloudFront a um bucket S3 privado.
+resource "aws_cloudfront_origin_access_control" "s3_oac" {
+  name                              = "${var.project_name}-s3-oac"
+  description                       = "Origin Access Control for S3 bucket"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 # 2. CloudFront para distribuir o conteúdo do S3
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
-    domain_name = aws_s3_bucket.site.bucket_regional_domain_name
-    origin_id   = aws_s3_bucket.site.id
+    domain_name              = aws_s3_bucket.site.bucket_regional_domain_name
+    origin_id                = aws_s3_bucket.site.id
+    origin_access_control_id = aws_cloudfront_origin_access_control.s3_oac.id
   }
 
   enabled             = true
@@ -86,15 +93,15 @@ data "aws_iam_policy_document" "allow_cloudfront" {
     actions   = ["s3:GetObject"]
     resources = ["${aws_s3_bucket.site.arn}/*"]
 
-    principals {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
-
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceArn"
       values   = [aws_cloudfront_distribution.s3_distribution.arn]
+    }
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
     }
   }
 }

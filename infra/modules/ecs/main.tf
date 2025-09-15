@@ -9,6 +9,12 @@ resource "aws_ecs_cluster" "main" {
   name = "${var.project_name}-cluster"
 }
 
+# Log Group no CloudWatch para armazenar os logs do container
+resource "aws_cloudwatch_log_group" "main" {
+  name              = "/ecs/${var.project_name}-backend"
+  retention_in_days = 7 # Mantém os logs por 7 dias
+}
+
 # 3. IAM - Permissões
 
 # Role para a instância EC2 poder se comunicar com o ECS
@@ -201,6 +207,14 @@ resource "aws_ecs_task_definition" "main" {
       containerPort = var.app_port
       hostPort      = 0 # Permite que o ECS escolha uma porta livre no host
     }]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.main.name
+        "awslogs-region"        = var.aws_region
+        "awslogs-stream-prefix" = "ecs"
+      }
+    }
     environment = [
       { name = "DATABASE_HOST", value = var.database_host },
       { name = "DATABASE_PORT", value = var.database_port },
