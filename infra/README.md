@@ -2,6 +2,8 @@
 
 Este diretório contém todo o código de Infraestrutura como Código (IaC) usando Terraform para provisionar os recursos necessários na AWS para a aplicação Kanban.
 
+Para uma visão geral da arquitetura, consulte o arquivo [READARCH.md](../../READARCH.md) na raiz do projeto.
+
 A estrutura é modular, visando a reutilização e a clareza.
 
 ## Estrutura dos Módulos
@@ -50,14 +52,14 @@ A infraestrutura é dividida nos seguintes módulos:
 
 Os arquivos na raiz (`main.tf`, `variables.tf`, `outputs.tf`) são responsáveis por conectar todos os módulos.
 
-- **`variables.tf`**: Define as entradas globais do projeto, como a região da AWS e as credenciais sensíveis (senhas de banco de dados, segredos JWT), que são solicitadas no momento do `apply`.
+- **`variables.tf`**: Define as entradas do projeto. Variáveis sensíveis (como `db_password` e `jwt_secret`) são declaradas aqui, mas seus valores são solicitados de forma interativa durante o `terraform apply` para evitar que sejam salvos no controle de versão.
 
 - **`outputs.tf`**: Expõe as saídas mais importantes da infraestrutura, como a URL final do frontend e do backend. Esses valores são impressos no terminal após a execução do `terraform apply`.
 
 - **`main.tf`**:
   - Declara o uso de cada módulo, passando as variáveis necessárias.
   - Orquestra a dependência entre os módulos. Por exemplo, passa o `vpc_id` do módulo `vpc` para os outros módulos.
-  - **Resolve a dependência circular** entre `ecs` e `rds` através de um recurso `aws_security_group_rule`. Este recurso cria a regra que permite ao Security Group do backend (`ecs`) acessar o Security Group do banco de dados (`rds`) na porta 5432, de forma desacoplada.
+  - **Gerencia as permissões de rede**: Cria a regra de `Security Group` que permite ao backend (ECS) se comunicar com o banco de dados (RDS) na porta 5432.
 
 ## Como Executar
 

@@ -1,108 +1,51 @@
 # Kanban - Desafio Full Stack
 
-Este é um projeto de um aplicativo Kanban completo, desenvolvido como um monorepo contendo um backend em NestJS e um frontend em Next.js.
+Este é um projeto de um aplicativo Kanban completo, desenvolvido como um monorepo contendo um backend em NestJS, um frontend em Next.js e a infraestrutura como código com Terraform.
 
 ## 🚀 Tecnologias Utilizadas
 
-- **Monorepo:** [NPM Workspaces](https://docs.npmjs.com/cli/v7/using-npm/workspaces)
+- **Monorepo:** [NPM Workspaces](https://docs.npmjs.com/cli/v8/using-npm/workspaces)
 - **Backend:** [NestJS](https://nestjs.com/), [TypeORM](https://typeorm.io/), [PostgreSQL](https://www.postgresql.org/)
 - **Frontend:** [Next.js](https://nextjs.org/), [React](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/)
 - **Testes:** [Jest](https://jestjs.io/) (Unitários), [Cypress](https://www.cypress.io/) (E2E)
 - **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
 
-## 📂 Estrutura do Projeto
+## 📚 Documentação
 
-O projeto é organizado como um monorepo para facilitar o desenvolvimento e o gerenciamento de dependências:
+A documentação do projeto está dividida para facilitar a consulta:
 
-```
-/
-├── app/
-│   ├── backend/      # Aplicação NestJS (API)
-│   └── frontend/     # Aplicação Next.js (UI)
-├── package.json      # Configuração do workspace
-└── README.md         # Este arquivo
-```
+*   **🏛️ Documentação da Arquitetura (READARCH.md)**: Detalhes sobre a infraestrutura na AWS, componentes e fluxos de dados.
+*   **⚙️ Guia de Configuração (READCONFIG.md)**: Instruções e lista de todas as variáveis de ambiente necessárias.
+*   **🏗️ Infraestrutura como Código (infra/README.md)**: Explicação detalhada dos módulos Terraform.
 
-## ✅ Pré-requisitos
+## 🚀 Começando (Desenvolvimento Local)
 
-Antes de começar, certifique-se de ter instalado:
+1.  **Pré-requisitos:** Garanta que você tenha Node.js (v20+), NPM (v10+) e Docker instalados.
 
-- [Node.js](https://nodejs.org/) (versão 20.x ou superior)
-- [NPM](https://www.npmjs.com/) (versão 10.x ou superior)
-- [Docker](https://www.docker.com/) (para rodar o banco de dados PostgreSQL)
-
-## ⚙️ Instalação e Configuração
-
-Siga os passos abaixo para configurar o ambiente de desenvolvimento.
-
-1.  **Clone o repositório:**
+2.  **Clonar o repositório:**
     ```bash
-    git clone https://github.com/seu-usuario/Kanban-desafio.git
+    git clone <URL_DO_REPOSITORIO>
     cd Kanban-desafio
     ```
 
-2.  **Instale as dependências:**
-    > **Importante:** Execute este comando **apenas na raiz do projeto**. O NPM Workspaces cuidará de instalar as dependências para o `frontend` e o `backend`.
+3.  **Instalar dependências:** Na raiz do projeto, execute:
     ```bash
     npm install
     ```
 
-3.  **Configure as Variáveis de Ambiente:**
-    No diretório `app/backend`, crie um arquivo `.env` a partir do exemplo:
-    ```bash
-    cp app/backend/.env.example app/backend/.env
-    ```
-    Ajuste as variáveis no arquivo `app/backend/.env` se necessário (as senhas padrão já devem funcionar com o Docker Compose).
+4.  **Configurar Variáveis de Ambiente:** Siga as instruções no **Guia de Configuração**.
 
-4
-
-4.  **Inicie o Banco de Dados:**
-    Use o Docker Compose para iniciar o container do PostgreSQL.
+5.  **Iniciar o Banco de Dados e Rodar a Aplicação:**
     ```bash
+    # Inicia o container do banco de dados em background
     docker-compose up -d
-    ```
 
-5.  **Rode as Migrations:**
-    Para criar as tabelas no banco de dados, execute o script de migration do TypeORM.
-    ```bash
+    # Roda as migrations para criar as tabelas
     npm run typeorm:run-migrations -w backend
+
+    # Inicia o backend e o frontend simultaneamente
+    npm run dev
     ```
-
-## 🏃‍♀️ Rodando a Aplicação
-
-Você pode rodar o frontend e o backend separadamente ou juntos.
-
-### Rodando Separadamente
-
-```bash
-# Em um terminal, para rodar o backend (API na porta 3000)
-npm run start:dev -w backend
-
-# Em outro terminal, para rodar o frontend (UI na porta 3001)
-npm run dev -w frontend
-```
-
-### Rodando Simultaneamente
-
-Para rodar ambos com um único comando, instale o `concurrently`:
-
-```bash
-npm install concurrently -D
-```
-
-E adicione o seguinte script ao `package.json` da **raiz**:
-
-```json
-"scripts": {
-  "dev": "concurrently \"npm:start:dev -w backend\" \"npm:dev -w frontend\""
-}
-```
-
-Agora, você pode iniciar tudo com:
-
-```bash
-npm run dev
-```
 
 ## 🧪 Rodando os Testes
 

@@ -1,24 +1,16 @@
-# Frontend (Next.js)
+# Kanban - Frontend (Next.js)
 
-Aplicação frontend construída com Next.js e Tailwind CSS.
+Esta é a aplicação frontend do projeto Kanban, construída com **Next.js**, **React** e **Tailwind CSS**.
 
-## Scripts Disponíveis
+Para informações sobre a arquitetura geral e configuração do projeto, consulte o [README principal](../../README.md).
+
+## 🚀 Executando a Aplicação
+
+Para iniciar o servidor de desenvolvimento, execute:
 
 ```bash
 # Inicia o servidor de desenvolvimento com Turbopack
 npm run dev
-
-# Compila a aplicação para produção
-npm run build
-
-# Inicia um servidor de produção
-npm run start
-
-# Roda os testes de unidade com Jest
-npm run test
-
-# Roda os testes E2E com Cypress
-npm run cy:run
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
